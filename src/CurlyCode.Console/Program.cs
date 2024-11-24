@@ -1,2 +1,7 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using CurlyCode.Console.Command;
+using Spectre.Console.Cli;
+
+
+var app = new CommandApp<CompileCommand>();
+
+return app.Run(args);

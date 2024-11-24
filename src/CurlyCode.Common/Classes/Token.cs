@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CurlyCode.Common.Enums;
 
-namespace CurlyCode.Common.Classes
+namespace CurlyCode.Common.Classes;
+
+public record Token 
 {
-    internal class Token
+    public TokenType TokenType { get; set; }
+    public string? Data { get; set; }
+
+    public Token(TokenType tokenType, string? data)
     {
+        TokenType = tokenType;
+        Data = data;
     }
 }

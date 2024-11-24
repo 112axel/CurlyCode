@@ -4,16 +4,28 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Lexer", "CurlyCode.Lexer\CurlyCode.Lexer.csproj", "{203E5A06-5F2F-487C-9DFD-27C0608963EB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B} = {8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Parser", "CurlyCode.Parser\CurlyCode.Parser.csproj", "{259AB75A-87FD-448A-8147-BDC1E5D71668}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B} = {8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Common", "CurlyCode.Common\CurlyCode.Common.csproj", "{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Console", "CurlyCode.Console\CurlyCode.Console.csproj", "{3ACCBA6C-5AE3-4403-B381-798249B70B85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{203E5A06-5F2F-487C-9DFD-27C0608963EB} = {203E5A06-5F2F-487C-9DFD-27C0608963EB}
+		{259AB75A-87FD-448A-8147-BDC1E5D71668} = {259AB75A-87FD-448A-8147-BDC1E5D71668}
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B} = {8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{203E5A06-5F2F-487C-9DFD-27C0608963EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,5 +36,16 @@ Global
 		{259AB75A-87FD-448A-8147-BDC1E5D71668}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{259AB75A-87FD-448A-8147-BDC1E5D71668}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{259AB75A-87FD-448A-8147-BDC1E5D71668}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
