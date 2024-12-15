@@ -1,14 +1,14 @@
 ﻿using CurlyCode.Common.Classes;
-using System.Reflection.Metadata.Ecma335;
+using CurlyCode.Parser;
 using System.Text;
 
 namespace CurlyCode.Lexer;
 
 public static class Lexer
 {
-    public static List<Token> Run(StreamReader stream)
+    public static TokenList Run(StreamReader stream)
     {
-        List<Token> tokens = new List<Token>();
+        TokenList tokens = new TokenList();
         while (stream.Peek() != -1)
         {
             var token = GetToken(stream);
@@ -51,7 +51,12 @@ public static class Lexer
 
         if(word == "int")
         {
-            return new Token(Common.Enums.TokenType.Type, word);
+            return new Token(Common.Enums.TokenType.NumberType, word);
+        }
+
+        if(word == "exit")
+        {
+            return new Token(Common.Enums.TokenType.Exit, null);
         }
 
         return new Token(Common.Enums.TokenType.Number, word);

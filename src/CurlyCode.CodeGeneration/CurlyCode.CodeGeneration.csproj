@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\CurlyCode.CodeGeneration\CurlyCode.CodeGeneration.csproj" />
-    <ProjectReference Include="..\CurlyCode.Common\CurlyCode.Common.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CurlyCode.Common\CurlyCode.Common.csproj" />
+    <ProjectReference Include="..\CurlyCode.Parser\CurlyCode.Parser.csproj" />
   </ItemGroup>
 
 </Project>

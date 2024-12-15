@@ -2,7 +2,7 @@
   "profiles": {
     "CurlyCode.Console": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\axelc\\Downloads\\test.cc"
+      "commandLineArgs": "C:\\Users\\axelc\\source\\repos\\CurlyCode\\compile\\test.curly"
     }
   }
 }

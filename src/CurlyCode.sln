@@ -10,6 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Lexer", "CurlyCod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Parser", "CurlyCode.Parser\CurlyCode.Parser.csproj", "{259AB75A-87FD-448A-8147-BDC1E5D71668}"
 	ProjectSection(ProjectDependencies) = postProject
+		{09B18C31-E504-4BEC-8C3D-85E4AF831122} = {09B18C31-E504-4BEC-8C3D-85E4AF831122}
 		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B} = {8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}
 	EndProjectSection
 EndProject
@@ -21,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.Console", "CurlyC
 		{259AB75A-87FD-448A-8147-BDC1E5D71668} = {259AB75A-87FD-448A-8147-BDC1E5D71668}
 		{8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B} = {8B43B123-1E5F-4BA3-BB36-91BDBAE15E4B}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurlyCode.CodeGeneration", "CurlyCode.CodeGeneration\CurlyCode.CodeGeneration.csproj", "{09B18C31-E504-4BEC-8C3D-85E4AF831122}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +47,10 @@ Global
 		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3ACCBA6C-5AE3-4403-B381-798249B70B85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09B18C31-E504-4BEC-8C3D-85E4AF831122}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09B18C31-E504-4BEC-8C3D-85E4AF831122}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09B18C31-E504-4BEC-8C3D-85E4AF831122}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09B18C31-E504-4BEC-8C3D-85E4AF831122}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

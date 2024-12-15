@@ -2,7 +2,7 @@
 
 public static class FileService
 {
-    public static StreamReader GetStream(string path)
+    public static StreamReader GetReadStream(string path)
     {
         if (!File.Exists(path))
         {
@@ -10,6 +10,12 @@ public static class FileService
         }
 
         StreamReader stream = new StreamReader(path);
+        return stream;
+    }
+
+    public static StreamWriter GetStreamWriter(string path)
+    {
+        StreamWriter stream = new StreamWriter(path);
         return stream;
     }
 
