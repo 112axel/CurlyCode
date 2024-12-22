@@ -2,11 +2,11 @@
 
 public static class SysCalls
 {
-    public static void Exit(StreamWriter writer)
+    public static void Exit(StreamWriter writer,int exitCode = 0)
     {
-
-        writer.WriteLine("mov rax, 60");
-        writer.WriteLine("mov rdi, 20");
+        const int ExitSyscall = 60;
+        writer.WriteLine($"mov rax, {ExitSyscall}");
+        writer.WriteLine($"mov rdi, {exitCode}");
         writer.WriteLine("syscall");
     }
 

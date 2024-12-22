@@ -1,11 +1,10 @@
 ﻿using CurlyCode.CodeGeneration;
+using CurlyCode.Common.Enums;
 
 namespace CurlyCode.Parser;
 
 public static class Parser
 {
-
-
 
     public static void Parse(TokenList tokens, StreamWriter outStream)
     {
@@ -21,23 +20,27 @@ public static class Parser
 
     private static void AA(TokenList tokenList,StreamWriter writer)
     {
-        if(tokenList.Peek().TokenType == Common.Enums.TokenType.Exit)
-            if(tokenList.Peek(1).TokenType == Common.Enums.TokenType.Number)
+        if (tokenList.Peek().TokenType == TokenType.Exit)
+            if(tokenList.Peek(1).TokenType == TokenType.Number)
             {
                 tokenList.ConsumeToken();
-                //tokenList.ConsumeToken();
-                SysCalls.Exit(writer);
+                var token = tokenList.ConsumeToken();
+                SysCalls.Exit(writer,int.Parse(token.Data));
             }
 
+        //int assignment
+        if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Number))
+        {
+            //StackAbstraction.AddVariable()
+        }
 
-
-        if (tokenList.Peek().TokenType == Common.Enums.TokenType.Type)
-            if (tokenList.Peek(1).TokenType == Common.Enums.TokenType.Text)
-                if (tokenList.Peek(2).TokenType == Common.Enums.TokenType.Assignment)
-                    if (tokenList.Peek(3).TokenType == Common.Enums.TokenType.Number)
-                    {
-                        writer.Write(' ');
-                    }
+        //if (tokenList.Peek().TokenType == TokenType.Type)
+        //    if (tokenList.Peek(1).TokenType == TokenType.Text)
+        //        if (tokenList.Peek(2).TokenType == TokenType.Assignment)
+        //            if (tokenList.Peek(3).TokenType == TokenType.Number)
+        //            {
+        //                writer.Write(' ');
+        //            }
 
 
 
