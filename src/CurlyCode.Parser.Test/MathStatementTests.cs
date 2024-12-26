@@ -37,4 +37,11 @@ public sealed class MathStatementTests
         var math = "(5+6)*2";
         Assert.AreEqual(Calculate(math), 22);
     }
+
+    [TestMethod]
+    public void Advanced()
+    {
+        var math = "5+2*5*4";
+        Assert.AreEqual(Calculate(math), 45);
+    }
 }
