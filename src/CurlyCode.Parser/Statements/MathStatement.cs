@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel.Design;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -18,7 +19,9 @@ public class MathStatement
        Sub,
        Divide,
        Mult,
-       TermNumber
+       TermNumber,
+       OpenParenthesis,
+       ClosedParenthesis
     }
 
     public float Calculate(string mathInput)
@@ -31,10 +34,26 @@ public class MathStatement
         return ExecutePlan(calculationPlan,numbers);
     }
 
+    //private List<string> SplitCalculation(string mathInput)
+    //{
+    //    var result = new List<string>();
+
+    //    var builder = new StringBuilder();
+
+    //    foreach (var a in mathInput)
+    //    {
+
+    //        if(a == )
+    //    }
+
+    //    result.Add(builder.ToString());
+    //    return result;
+    //}
+
     private Dictionary<int,int> GetNumbers(string mathInput)
     {
         var output = new Dictionary<int, int>();
-        Regex findNumbers = new Regex(@"(?:[/*+-]|^)-?(\d)");
+        Regex findNumbers = new Regex(@"(?:[/*+\-(]|^)-?(\d)");
 
         var a = findNumbers.Matches(mathInput);
         for(int i = 0; i<a.Count; i++)
@@ -74,7 +93,12 @@ public class MathStatement
         var doubleSign = false;
         foreach (var a in mathInput)
         {
-            if (char.IsDigit(a))
+            if(a == '(' || a == ')')
+            {
+                builder.Append(a);
+                continue;
+            }
+            if (char.IsDigit(a) )
             {
                 doubleSign = false;
                 continue;
@@ -97,6 +121,8 @@ public class MathStatement
                 '-' => Operation.Sub,
                 '*' => Operation.Mult,
                 '/' => Operation.Divide,
+                '(' => Operation.OpenParenthesis,
+                ')' => Operation.ClosedParenthesis,
                 _ => throw new NotImplementedException()
             };
             output.Add(d);
@@ -109,11 +135,18 @@ public class MathStatement
     {
         var number = 0;
         var list2 = new List<TreeMath>();
-        list2.Add(new TreeMath(number++));
+        if (text[0] != Operation.OpenParenthesis)
+        {
+            list2.Add(new TreeMath(number++));
+        }
+
         foreach (Operation op in text)
         {
             list2.Add(new TreeMath(op));
-            list2.Add(new TreeMath(number++));
+            if(op != Operation.ClosedParenthesis)
+            {
+                list2.Add(new TreeMath(number++));
+            }
         }
 
         Reduce(list2);
@@ -128,6 +161,7 @@ public class MathStatement
 
     private void Reduce(List<TreeMath> treeMaths)
     {
+        ReduceParenesis(treeMaths);
         ReduceTreeMath(treeMaths, [Operation.Mult, Operation.Divide]);
         ReduceTreeMath(treeMaths, [Operation.Add, Operation.Sub]);
     }
@@ -146,6 +180,36 @@ public class MathStatement
                 list.Remove(term2);
                 i -= 1;
             }
+        }
+    }
+
+    private void ReduceParenesis(List<TreeMath> treeMaths)
+    {
+        var inBlock = false;
+        var blockStart = 0;
+        var output = new List<TreeMath>();
+        for (int i = 0; i < treeMaths.Count; i++)
+        {
+            if (treeMaths[i].Operation == Operation.ClosedParenthesis)
+            {
+                inBlock = false;
+                Reduce(output);
+
+                treeMaths[i] = output.First();
+                treeMaths.RemoveRange(blockStart, i - blockStart);
+
+                return;
+            }
+            else if (inBlock)
+            {
+                output.Add(treeMaths[i]);
+            }
+            else if (treeMaths[i].Operation == Operation.OpenParenthesis)
+            {
+                inBlock = true;
+                blockStart = i;
+            }
+
         }
     }
 
