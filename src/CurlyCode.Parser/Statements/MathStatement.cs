@@ -28,7 +28,7 @@ public class MathStatement
     {
         var ops = GetOperations(mathInput);
         var numbers = GetNumbers(mathInput);
-        var calculationPlan = GetExecutionTree(ops);
+        var calculationPlan = GetExecutionTree(new(ops));
 
         
         return ExecutePlan(calculationPlan,numbers);
@@ -131,56 +131,67 @@ public class MathStatement
         return output;
     }
 
-    private TreeMath GetExecutionTree(List<Operation> text)
+    private TreeMath GetExecutionTree(Stack<Operation> stack)
     {
-        var number = 0;
+        var num = 0;
+        var a = GetTreeMaths(stack,ref num);
+
+        var output = Reduce(a);
+        if (output.Count > 1)
+        {
+            throw new Exception("multiple nodes left");
+        }
+
+        return output.First();
+
+    }
+
+    private List<TreeMath> GetTreeMaths(Stack<Operation> stack, ref int number)
+    {
+        var operation = stack.Peek();
+        if(operation == Operation.OpenParenthesis)
+        {
+            GetTreeMaths(stack,ref number);
+        }
         var list2 = new List<TreeMath>();
-        if (text[0] != Operation.OpenParenthesis)
+        if (stack.Peek() != Operation.OpenParenthesis)
         {
             list2.Add(new TreeMath(number++));
         }
-
-        foreach (Operation op in text)
+        while(stack.Count > 0) 
         {
+            var op = stack.Pop();
             list2.Add(new TreeMath(op));
             if(op != Operation.ClosedParenthesis)
             {
                 list2.Add(new TreeMath(number++));
             }
         }
-
-        Reduce(list2);
-        if (list2.Count > 1)
-        {
-            throw new Exception("multiple nodes left");
-        }
-
-        return list2.First();
-
+        return list2;
     }
 
-    private void Reduce(List<TreeMath> treeMaths)
+    private List<TreeMath> Reduce(List<TreeMath> treeMaths)
     {
-        ReduceParenesis(treeMaths);
-        ReduceTreeMath(treeMaths, [Operation.Mult, Operation.Divide]);
-        ReduceTreeMath(treeMaths, [Operation.Add, Operation.Sub]);
+        var a = ReduceTreeMath(treeMaths, [Operation.Mult, Operation.Divide]);
+        return ReduceTreeMath(a, [Operation.Add, Operation.Sub]);
     }
 
-    private void ReduceTreeMath(List<TreeMath> list, List<Operation> operations)
+    private List<TreeMath> ReduceTreeMath(List<TreeMath> list, List<Operation> operations)
     {
+        var newList = new List<TreeMath>(list);
         for (int i = 0; i < list.Count; i++)
         {
             TreeMath operation = list[i];
             if (operations.Contains(operation.Operation))
             {
-                var term1 = list[i - 1];
-                var term2 = list[i + 1];
-                list[i] = new TreeMath(operation.Operation, term1, term2);
-                list.Remove(term1);
-                list.Remove(term2);
-                i -= 1;
+                var term1 = newList[i - 1];
+                var term2 = newList[i + 1];
+                newList[i] = new TreeMath(operation.Operation, term1, term2);
+                newList.Remove(term1);
+                newList.Remove(term2);
             }
         }
+        return newList;
     }
 
     private void ReduceParenesis(List<TreeMath> treeMaths)
