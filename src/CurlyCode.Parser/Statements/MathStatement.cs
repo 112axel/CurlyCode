@@ -30,25 +30,51 @@ public class MathStatement
         var numbers = GetNumbers(mathInput);
         var calculationPlan = GetExecutionTree(new(ops));
 
+        var maps = MapNumbers(numbers,calculationPlan);
         
-        return ExecutePlan(calculationPlan,numbers);
+        return ExecutePlan(calculationPlan,maps);
     }
 
-    //private List<string> SplitCalculation(string mathInput)
-    //{
-    //    var result = new List<string>();
+    private Dictionary<TreeMath, int> MapNumbers(Dictionary<int,int> numbers,TreeMath plan)
+    {
+        var a = PostOrderSearch(plan);
+        Dictionary<TreeMath, int> output = [];
+        int counter = 0;
+        foreach (var node in a)
+        {
+            if(node.Operation == Operation.TermNumber)
+            {
+                output.Add(node, numbers[counter]);
+                counter++;
+            }
+        }
+        return output;
+    }
 
-    //    var builder = new StringBuilder();
+    private List<TreeMath> PostOrderSearch(TreeMath treeMath, List<TreeMath>? output = null)
+    {
+        if (output == null)
+        {
+            output = new List<TreeMath>();
+        }
 
-    //    foreach (var a in mathInput)
-    //    {
+        output.Add(treeMath);
 
-    //        if(a == )
-    //    }
+        if (treeMath.Operation == Operation.TermNumber)
+        {
+            return output;
+        }
 
-    //    result.Add(builder.ToString());
-    //    return result;
-    //}
+        if(treeMath.Term1 != null)
+        {
+            PostOrderSearch(treeMath.Term1, output);
+        }
+        if(treeMath.Term2 != null)
+        {
+            PostOrderSearch(treeMath.Term2, output);
+        }
+        return output;
+    }
 
     private Dictionary<int,int> GetNumbers(string mathInput)
     {
@@ -63,16 +89,11 @@ public class MathStatement
         return output;
     }
 
-    private float ExecutePlan(TreeMath treeNode,Dictionary<int,int> values)
+    private float ExecutePlan(TreeMath treeNode,Dictionary<TreeMath,int> values)
     {
         if(treeNode.Operation == Operation.TermNumber)
         {
-            if (treeNode.TermNumber == null)
-            {
-                throw new Exception("Should always have a term number");
-            }
-            //?? is needed for some reason
-            return values[treeNode.TermNumber??0];
+            return values[treeNode];
         }
         if (treeNode.Operation == Operation.Add)
             return ExecutePlan(treeNode.Term1!,values) + ExecutePlan(treeNode.Term2!,values);
@@ -131,10 +152,9 @@ public class MathStatement
         return output;
     }
 
-    private TreeMath GetExecutionTree(Stack<Operation> stack)
+    private TreeMath GetExecutionTree(Queue<Operation> stack)
     {
-        var num = 0;
-        var a = GetTreeMaths(stack,ref num);
+        var a = GetTreeMaths(stack);
 
         var output = Reduce(a);
         if (output.Count > 1)
@@ -146,90 +166,86 @@ public class MathStatement
 
     }
 
-    private List<TreeMath> GetTreeMaths(Stack<Operation> stack, ref int number)
+    private List<TreeMath> GetTreeMaths(Queue<Operation> stack)
     {
-        var operation = stack.Peek();
-        if(operation == Operation.OpenParenthesis)
+        var list = new List<TreeMath>();
+        bool first = true;
+        while (stack.Count > 0)
         {
-            GetTreeMaths(stack,ref number);
-        }
-        var list2 = new List<TreeMath>();
-        if (stack.Peek() != Operation.OpenParenthesis)
-        {
-            list2.Add(new TreeMath(number++));
-        }
-        while(stack.Count > 0) 
-        {
-            var op = stack.Pop();
-            list2.Add(new TreeMath(op));
-            if(op != Operation.ClosedParenthesis)
+            var value = stack.Dequeue();
+            if(value == Operation.OpenParenthesis || value == Operation.ClosedParenthesis)
             {
-                list2.Add(new TreeMath(number++));
+                list.Add(new(value));
+            }
+            else
+            {
+                if (list.LastOrDefault()?.Operation != Operation.ClosedParenthesis)
+                {
+                    list.Add(new());
+                    //first = false;
+                }
+                list.Add(new(value));
+                if(stack.Count > 0 && stack.Peek() == Operation.ClosedParenthesis)
+                {
+                    list.Add(new());
+                }
             }
         }
-        return list2;
+        list.Add(new());
+
+        return list;
     }
 
-    private List<TreeMath> Reduce(List<TreeMath> treeMaths)
+    private List<TreeMath> Reduce(List<TreeMath> treeMaths, int index = 0)
     {
-        var a = ReduceTreeMath(treeMaths, [Operation.Mult, Operation.Divide]);
-        return ReduceTreeMath(a, [Operation.Add, Operation.Sub]);
+        var a = ReduceTreeMath(treeMaths, [Operation.Mult, Operation.Divide], index);
+        var list = ReduceTreeMath(a, [Operation.Add, Operation.Sub], index);
+        if (index != 0)
+        {
+            list.RemoveAt(index + 1);
+            list.RemoveAt(index - 1);
+        }
+        return list;
     }
 
-    private List<TreeMath> ReduceTreeMath(List<TreeMath> list, List<Operation> operations)
+    private List<TreeMath> ReduceTreeMath(List<TreeMath> list, List<Operation> operations, int index)
     {
-        var newList = new List<TreeMath>(list);
-        for (int i = 0; i < list.Count; i++)
+        for (int i = index; i < list.Count; i++)
         {
             TreeMath operation = list[i];
+            if (operation.Operation == Operation.ClosedParenthesis)
+            {
+                //list.Remove(operation);
+                return list;
+            }
+
+            if (operation.Operation == Operation.OpenParenthesis)
+            {
+                Reduce(list, i + 1);
+            }
+
             if (operations.Contains(operation.Operation))
             {
-                var term1 = newList[i - 1];
-                var term2 = newList[i + 1];
-                newList[i] = new TreeMath(operation.Operation, term1, term2);
-                newList.Remove(term1);
-                newList.Remove(term2);
+                var term1 = list[i - 1];
+                if (list[i + 1].Operation == Operation.OpenParenthesis)
+                {
+                    Reduce(list, i + 2);
+                }
+                var term2 = list[i + 1];
+                list[i] = new TreeMath(operation.Operation, term1, term2);
+                list.Remove(term1);
+                list.Remove(term2);
+                i -= 1;
             }
         }
-        return newList;
-    }
-
-    private void ReduceParenesis(List<TreeMath> treeMaths)
-    {
-        var inBlock = false;
-        var blockStart = 0;
-        var output = new List<TreeMath>();
-        for (int i = 0; i < treeMaths.Count; i++)
-        {
-            if (treeMaths[i].Operation == Operation.ClosedParenthesis)
-            {
-                inBlock = false;
-                Reduce(output);
-
-                treeMaths[i] = output.First();
-                treeMaths.RemoveRange(blockStart, i - blockStart);
-
-                return;
-            }
-            else if (inBlock)
-            {
-                output.Add(treeMaths[i]);
-            }
-            else if (treeMaths[i].Operation == Operation.OpenParenthesis)
-            {
-                inBlock = true;
-                blockStart = i;
-            }
-
-        }
+        return list;
     }
 
     private class TreeMath
     {
-        public TreeMath(int termNumber)
+        public TreeMath()
         {
             Operation = Operation.TermNumber;
-            TermNumber = termNumber;
         }
 
         public TreeMath(Operation operation, TreeMath term1, TreeMath term2)
@@ -247,6 +263,5 @@ public class MathStatement
         public Operation Operation { get; set; }
         public TreeMath? Term1 { get; set; }
         public TreeMath? Term2 { get; set; }
-        public int? TermNumber { get; set; }
     }
 }
