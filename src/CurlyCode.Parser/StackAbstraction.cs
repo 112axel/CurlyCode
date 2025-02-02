@@ -15,7 +15,7 @@ public static class StackAbstraction
 
     public static int GetAddress(string variableName)
     {
-        return 0;
+        return VariablePosition[variableName];
     }
 
     public static void AddVariable(string variableName)

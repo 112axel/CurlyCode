@@ -4,7 +4,7 @@ public static class StackCode
 {
     public static void AddValueToStack(StreamWriter writer, int number)
     {
-        writer.WriteLine("push " +number);
+        writer.WriteLine("push eax");
     }
 
     public static void GetValueFromStack(StreamWriter writer,int offset)

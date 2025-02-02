@@ -20,7 +20,7 @@ public static class Lexer
 
     private static Token GetToken(StreamReader stream)
     {
-        string word = ReadWord(stream);
+        string? word = StreamWordReader.ReadWord(stream);
         //operations
         if (word == "+")
         {
@@ -63,22 +63,6 @@ public static class Lexer
 
     }
 
-    private static string ReadWord(StreamReader stream)
-    {
-        //remove leading space
-        while((char)stream.Peek() == ' ' && stream.Peek() != -1)
-        {
-            stream.Read();
-        }
-
-        StringBuilder stringBuilder = new StringBuilder();
-        while((char)stream.Peek() != ' ' && stream.Peek() != -1)
-        {
-            stringBuilder.Append((char)stream.Read());
-        }
-        return stringBuilder.ToString();
-
-    }
 
 }
 
