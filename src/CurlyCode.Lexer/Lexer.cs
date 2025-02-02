@@ -1,4 +1,5 @@
 ﻿using CurlyCode.Common.Classes;
+using CurlyCode.Common.Enums;
 using CurlyCode.Parser;
 using System.Text;
 
@@ -20,49 +21,57 @@ public static class Lexer
 
     private static Token GetToken(StreamReader stream)
     {
-        string? word = StreamWordReader.ReadWord(stream);
+        string word = StreamWordReader.ReadWord(stream);
         //operations
+        return ConvertTextToToken(word);
+    }
+
+    public static Token ConvertTextToToken(string word)
+    {
         if (word == "+")
         {
-            return new Token(Common.Enums.TokenType.Add, null);
+            return new Token(TokenType.Add, null);
         }
         if (word == "-")
         {
-            return new Token(Common.Enums.TokenType.Subtract, null);
+            return new Token(TokenType.Subtract, null);
         }
         if (word == "/")
         {
-            return new Token(Common.Enums.TokenType.Subtract, null);
+            return new Token(TokenType.Divide, null);
         }
         if (word == "*")
         {
-            return new Token(Common.Enums.TokenType.Subtract, null);
+            return new Token(TokenType.Multiply, null);
         }
 
         if (word == "=")
         {
-            return new Token(Common.Enums.TokenType.Assignment, null);
+            return new Token(TokenType.Assignment, null);
         }
 
-        if(word == ";")
+        if (word == ";")
         {
-            return new Token(Common.Enums.TokenType.End, null);
+            return new Token(TokenType.End, null);
         }
 
-        if(word == "int")
+        if (word == "int")
         {
-            return new Token(Common.Enums.TokenType.NumberType, word);
+            return new Token(TokenType.NumberType, word);
         }
 
-        if(word == "exit")
+        if (word == "exit")
         {
-            return new Token(Common.Enums.TokenType.Exit, null);
+            return new Token(TokenType.Exit, null);
+        }
+        if (int.TryParse(word, out _))
+        {
+            return new Token(TokenType.Number, word);
         }
 
-        return new Token(Common.Enums.TokenType.Number, word);
+        return new Token(TokenType.Text, word);
 
     }
-
 
 }
 
