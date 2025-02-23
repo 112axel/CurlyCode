@@ -22,4 +22,14 @@ public sealed class LexerTests
         Assert.AreEqual(output.TokenType, TokenType.Text, "Not the right token type");
         Assert.AreEqual(output.Data, input, "Not the right token type");
     }
+
+    [TestMethod]
+    public void Number()
+    {
+        var input = "112";
+        var output = Lexer.ConvertTextToToken(input);
+
+        Assert.AreEqual(output.TokenType, TokenType.Number, "Not the right token type");
+        Assert.AreEqual(output.Data, input, "Not the right token type");
+    }
 }

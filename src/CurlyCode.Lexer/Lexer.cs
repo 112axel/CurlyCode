@@ -28,42 +28,25 @@ public static class Lexer
 
     public static Token ConvertTextToToken(string word)
     {
-        if (word == "+")
+        return word switch
         {
-            return new Token(TokenType.Add, null);
-        }
-        if (word == "-")
-        {
-            return new Token(TokenType.Subtract, null);
-        }
-        if (word == "/")
-        {
-            return new Token(TokenType.Divide, null);
-        }
-        if (word == "*")
-        {
-            return new Token(TokenType.Multiply, null);
-        }
+            "+" => new Token(TokenType.Add, null),
+            "-" => new Token(TokenType.Subtract, null),
+            "/" => new Token(TokenType.Divide, null),
+            "*" => new Token(TokenType.Multiply, null),
 
-        if (word == "=")
-        {
-            return new Token(TokenType.Assignment, null);
-        }
+            "=" => new Token(TokenType.Assignment, null),
+            ";" => new Token(TokenType.End, null),
+            "int" => new Token(TokenType.NumberType, word),
+            "exit" => new Token(TokenType.Exit, null),
 
-        if (word == ";")
-        {
-            return new Token(TokenType.End, null);
-        }
+            _ => NumberOrText(word)
+        };
+    }
 
-        if (word == "int")
-        {
-            return new Token(TokenType.NumberType, word);
-        }
 
-        if (word == "exit")
-        {
-            return new Token(TokenType.Exit, null);
-        }
+    private static Token NumberOrText(string word)
+    {
         if (int.TryParse(word, out _))
         {
             return new Token(TokenType.Number, word);

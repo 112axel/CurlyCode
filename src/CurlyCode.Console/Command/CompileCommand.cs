@@ -3,6 +3,8 @@ using CurlyCode.Lexer;
 using CurlyCode.Common.FileService;
 using Spectre.Console;
 using CurlyCode.Parser;
+using System.Runtime.InteropServices;
+using CurlyCode.CodeGeneration;
 namespace CurlyCode.Console.Command;
 
 internal sealed class CompileCommand : Command<CompileCommand.Settings>
@@ -13,7 +15,9 @@ internal sealed class CompileCommand : Command<CompileCommand.Settings>
 
         var stream = FileService.GetStreamWriter(settings.Path+".asm");
 
-        Parser.Parser.Parse(tokens, stream);
+        var operations = Parser.Parser.Parse(tokens);
+
+        CodeGeneration.CodeGeneration.ParseOperations(operations, stream); 
 
         stream.Flush();
         stream.Close();

@@ -1,6 +1,4 @@
-﻿using CurlyCode.CodeGeneration;
-
-namespace CurlyCode.Parser;
+﻿namespace CurlyCode.Parser;
 
 public static class StackAbstraction
 {
@@ -10,7 +8,7 @@ public static class StackAbstraction
 
     }
 
-    static Dictionary<string, int> VariablePosition;
+    static Dictionary<string, int> VariablePosition = new();
     static int TopOfStack;
 
     public static int GetAddress(string variableName)
@@ -23,5 +21,10 @@ public static class StackAbstraction
         VariablePosition[variableName] = TopOfStack;
         TopOfStack++;
        // StackCode.
+    }
+
+    public static bool Exists(string variableName)
+    {
+        return VariablePosition.ContainsKey(variableName);
     }
 }
