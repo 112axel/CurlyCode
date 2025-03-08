@@ -3,10 +3,10 @@ using CurlyCode.Common.Interfaces;
 
 namespace CurlyCode.Parser.Operation;
 
-internal class Assignment : BaseOperation, IOperation
+public class Assignment : BaseOperation, IOperation
 {
     public override int MaxStatements { get => 1; }
-    public Assignment(IStatement value) : base("",[value])
+    public Assignment(IStatement value, string name) : base(name, [value])
     {
     }
 

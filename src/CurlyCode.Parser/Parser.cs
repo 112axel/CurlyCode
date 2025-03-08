@@ -1,6 +1,7 @@
 ﻿using CurlyCode.Common.Classes.Operation;
 using CurlyCode.Common.Enums;
 using CurlyCode.Common.Interfaces;
+using CurlyCode.Parser.Operation;
 using CurlyCode.Parser.Statements;
 
 namespace CurlyCode.Parser;
@@ -25,39 +26,47 @@ public static class Parser
 
     private static void AA(this List<IOperation> operations, TokenList tokenList)
     {
-
-        if (tokenList.CheckForPattern(TokenType.Exit, TokenType.Number, TokenType.End))
+        var lastValue = -1;
+        while (tokenList.Peek() != null)
         {
-            tokenList.ConsumeToken();
-            var token = tokenList.ConsumeToken();
-            operations.Add(new Command("Exit", new AbsoluteStatement(int.Parse(token.Data))));
-            //SysCalls.Exit(writer, int.Parse(token.Data));
-            tokenList.ConsumeToken();
-        }
+            if (lastValue == operations.Count)
+                throw new Exception("Not able to use all Tokens");
 
-        //int assignment
-        if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Number, TokenType.End))
-        {
-            tokenList.ConsumeToken();
-            var name = tokenList.ConsumeToken().Data;
-
-            if (StackAbstraction.Exists(name))
+            lastValue = operations.Count;
+            if (tokenList.CheckForPattern(TokenType.Exit, TokenType.Number, TokenType.End))
             {
-                throw new Exception("Variable \"{name}\" is already defined");
+                tokenList.ConsumeToken();
+                var token = tokenList.ConsumeToken();
+                operations.Add(new Command("Exit", new AbsoluteStatement(int.Parse(token.Data))));
+                tokenList.ConsumeToken();
+            }
+            else if (tokenList.CheckForPattern(TokenType.Exit, TokenType.Text, TokenType.End))
+            {
+                tokenList.ConsumeToken();
+                var token = tokenList.ConsumeToken();
+                operations.Add(new Command("Exit", new VariableStatement((token.Data))));
+                tokenList.ConsumeToken();
+            }
+            //int assignment
+            else if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Number, TokenType.End))
+            {
+                tokenList.ConsumeToken();
+                var name = tokenList.ConsumeToken().Data;
+                tokenList.ConsumeToken();
+                var value = tokenList.ConsumeToken();
+
+                operations.Add(new Assignment(new AbsoluteStatement(int.Parse(value.Data)), name));
+
+                tokenList.ConsumeToken();
+                //StackCode.AddValueToStack(writer, int.Parse(tokenList.ConsumeToken().Data));
+            }
+            else if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Text, TokenType.End))
+            {
+
+                //StackCode.GetValueFromStack(writer, 0);
             }
 
-            StackAbstraction.AddVariable(name);
-            tokenList.ConsumeToken();
-            //StackCode.AddValueToStack(writer, int.Parse(tokenList.ConsumeToken().Data));
-            tokenList.ConsumeToken();
         }
-
-        if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Text, TokenType.End))
-        {
-
-            //StackCode.GetValueFromStack(writer, 0);
-        }
-
     }
 
 

@@ -4,10 +4,10 @@ namespace CurlyCode.Parser.Statements;
 
 public class VariableStatement : IStatement
 {
-    private readonly string varName;
-    internal VariableStatement(string name)
+    public readonly string Identifier;
+    public VariableStatement(string name)
     {
-        varName = name;
+        Identifier = name;
     }
 
     public int GetValue()

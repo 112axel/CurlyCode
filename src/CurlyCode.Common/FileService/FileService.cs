@@ -16,6 +16,7 @@ public static class FileService
     public static StreamWriter GetStreamWriter(string path)
     {
         StreamWriter stream = new StreamWriter(path);
+        stream.NewLine = "\n";
         return stream;
     }
 
