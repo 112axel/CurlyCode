@@ -1,8 +1,10 @@
-﻿using CurlyCode.Common.Classes.Operation;
+﻿using CurlyCode.Common.Classes;
+using CurlyCode.Common.Classes.Operation;
 using CurlyCode.Common.Enums;
 using CurlyCode.Common.Interfaces;
 using CurlyCode.Parser.Operation;
 using CurlyCode.Parser.Statements;
+using System.Dynamic;
 
 namespace CurlyCode.Parser;
 
@@ -12,7 +14,14 @@ public static class Parser
     public static List<IOperation> Parse(TokenList tokens)
     {
         var output = new List<IOperation>();
-        output.AA(tokens);
+
+        var lines = tokens.GetLines();
+
+        foreach (var line in lines)
+        {
+            output.ParseLine(line);
+        }
+
         output.End();
         return output;
     }
@@ -24,50 +33,92 @@ public static class Parser
         //SysCalls.Exit(operations);
     }
 
-    private static void AA(this List<IOperation> operations, TokenList tokenList)
+    private static void ParseLine(this List<IOperation> operations, TokenList tokenList)
     {
-        var lastValue = -1;
-        while (tokenList.Peek() != null)
-        {
-            if (lastValue == operations.Count)
-                throw new Exception("Not able to use all Tokens");
 
-            lastValue = operations.Count;
-            if (tokenList.CheckForPattern(TokenType.Exit, TokenType.Number, TokenType.End))
+            if (tokenList.CheckForPattern(TokenType.Text,TokenType.OpenParentheses))
             {
-                tokenList.ConsumeToken();
-                var token = tokenList.ConsumeToken();
-                operations.Add(new Command("Exit", new AbsoluteStatement(int.Parse(token.Data))));
+                var function = tokenList.ConsumeToken();
+                //var statement = GetStatement(tokenList);
+                operations.Add(new Command(function.Data, GetFunctionStatements(tokenList)));
                 tokenList.ConsumeToken();
             }
-            else if (tokenList.CheckForPattern(TokenType.Exit, TokenType.Text, TokenType.End))
+            else if (tokenList.CheckForPattern(TokenType.NumberType,TokenType.Text, TokenType.Assignment)|| tokenList.CheckForPattern(TokenType.Text, TokenType.Assignment))//variable assignment 
             {
+                var isDeclaration = false;
+                if(tokenList.Peek().TokenType == TokenType.NumberType)
+                {
+                    isDeclaration = true;
+                    tokenList.ConsumeToken();
+                }
+                var variableName = tokenList.ConsumeToken();
                 tokenList.ConsumeToken();
-                var token = tokenList.ConsumeToken();
-                operations.Add(new Command("Exit", new VariableStatement((token.Data))));
-                tokenList.ConsumeToken();
+                operations.Add(new Assignment(GetStatement(tokenList),variableName.Data,isDeclaration));
+
             }
-            //int assignment
-            else if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Number, TokenType.End))
-            {
-                tokenList.ConsumeToken();
-                var name = tokenList.ConsumeToken().Data;
-                tokenList.ConsumeToken();
-                var value = tokenList.ConsumeToken();
-
-                operations.Add(new Assignment(new AbsoluteStatement(int.Parse(value.Data)), name));
-
-                tokenList.ConsumeToken();
-                //StackCode.AddValueToStack(writer, int.Parse(tokenList.ConsumeToken().Data));
-            }
-            else if (tokenList.CheckForPattern(TokenType.NumberType, TokenType.Text, TokenType.Assignment, TokenType.Text, TokenType.End))
-            {
-
-                //StackCode.GetValueFromStack(writer, 0);
-            }
-
-        }
     }
 
+    private static List<IStatement> GetFunctionStatements(TokenList tokens)
+    {
+        var statements = new List<IStatement>();
+        var value = GetInsideParenthesis(tokens);
+
+        statements.Add(GetStatement(value));
+        return statements;
+    }
+
+    private static TokenList GetInsideParenthesis(TokenList tokens)
+    {
+        var output = new TokenList();
+        int open = 0;
+        foreach (var token in tokens)
+        {
+            if(token.TokenType == TokenType.OpenParentheses)
+                open++;
+            if(token.TokenType == TokenType.ClosedParentheses)
+                open--;
+            output.Add(token);
+            if(open == 0)
+            {
+                return output;
+            }
+        }
+        throw new Exception("Could not escape parenthesis");
+    }
+
+    private static IStatement GetStatement(TokenList tokens)
+    {
+        if (tokens.CheckForPattern(TokenType.Text, TokenType.End))
+        {
+            return new VariableStatement("a");
+        }
+        else if (tokens.CheckForPattern(TokenType.Number, TokenType.End))
+        {
+            return new AbsoluteStatement(1);
+        }
+        else
+        {
+
+        }
+        var terms = new List<IStatement>();
+
+        foreach (var token in tokens)
+        {
+            if (token.TokenType == TokenType.Number)
+            {
+                terms.Add(new AbsoluteStatement(int.Parse(token.Data)));
+            }
+            else if (token.TokenType == TokenType.Text)
+            {
+                throw new NotImplementedException("Get statement variables not implented");
+                //terms.Add((IStatement)token);
+            }
+            //tokens.ConsumeToken();
+        }
+
+        return new MathStatement(tokens) { Terms = terms };
+
+        throw new Exception("Could not find statement after");
+    }
 
 }

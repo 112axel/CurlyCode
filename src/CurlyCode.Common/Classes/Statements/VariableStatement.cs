@@ -9,11 +9,4 @@ public class VariableStatement : IStatement
     {
         Identifier = name;
     }
-
-    public int GetValue()
-    {
-        //StackAbstraction.GetAddress(varName);
-        //StackCode
-        return 0;
-    }
 }

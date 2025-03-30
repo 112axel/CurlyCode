@@ -32,4 +32,8 @@ public sealed class LexerTests
         Assert.AreEqual(output.TokenType, TokenType.Number, "Not the right token type");
         Assert.AreEqual(output.Data, input, "Not the right token type");
     }
+
+
+
+
 }

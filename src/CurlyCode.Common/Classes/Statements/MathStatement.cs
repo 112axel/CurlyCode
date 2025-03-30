@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.Design;
+﻿using CurlyCode.Common.Classes;
+using CurlyCode.Common.Enums;
+using CurlyCode.Common.Interfaces;
+using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
@@ -6,14 +9,16 @@ using System.Text.RegularExpressions;
 
 namespace CurlyCode.Parser.Statements;
 
-public class MathStatement 
+public class MathStatement : IStatement
 {
-    public MathStatement()
+    private readonly List<Token> Tokens;
+    public List<IStatement> Terms;
+    public MathStatement(List<Token> tokens)
     {
-
+        Tokens = tokens;
     }
 
-    enum Operation
+    public enum Operation
     {
        Add,
        Sub,
@@ -24,25 +29,48 @@ public class MathStatement
        ClosedParenthesis
     }
 
+    public TreeMath GetExecutionPlan()
+    {
+        var ops = GetOperations(Tokens);
+        var calculationPlan = GetExecutionTree(new(ops));
+        return calculationPlan;
+    }
+    public List<TreeMath> ReversePolishNotation(TreeMath treeMath, List<TreeMath>? outputList)
+    {
+        outputList ??= new List<TreeMath>();
+
+        if (treeMath.Operation == Operation.TermNumber)
+        {
+            outputList.Add(treeMath);
+            return outputList;
+        }
+        ReversePolishNotation(treeMath.Term1, outputList);
+        ReversePolishNotation(treeMath.Term2, outputList);
+
+        outputList.Add(treeMath);
+        return outputList;
+    }
+
+
     public float Calculate(string mathInput)
     {
         var ops = GetOperations(mathInput);
         var numbers = GetNumbers(mathInput);
         var calculationPlan = GetExecutionTree(new(ops));
 
-        var maps = MapNumbers(numbers,calculationPlan);
-        
-        return ExecutePlan(calculationPlan,maps);
+        var maps = MapNumbers(numbers, calculationPlan);
+
+        return ExecutePlan(calculationPlan, maps);
     }
 
-    private Dictionary<TreeMath, int> MapNumbers(Dictionary<int,int> numbers,TreeMath plan)
+    private Dictionary<TreeMath, int> MapNumbers(Dictionary<int, int> numbers, TreeMath plan)
     {
         var a = PostOrderSearch(plan);
         Dictionary<TreeMath, int> output = [];
         int counter = 0;
         foreach (var node in a)
         {
-            if(node.Operation == Operation.TermNumber)
+            if (node.Operation == Operation.TermNumber)
             {
                 output.Add(node, numbers[counter]);
                 counter++;
@@ -65,48 +93,70 @@ public class MathStatement
             return output;
         }
 
-        if(treeMath.Term1 != null)
+        if (treeMath.Term1 != null)
         {
             PostOrderSearch(treeMath.Term1, output);
         }
-        if(treeMath.Term2 != null)
+        if (treeMath.Term2 != null)
         {
             PostOrderSearch(treeMath.Term2, output);
         }
         return output;
     }
 
-    private Dictionary<int,int> GetNumbers(string mathInput)
+    private Dictionary<int, int> GetNumbers(string mathInput)
     {
         var output = new Dictionary<int, int>();
         Regex findNumbers = new Regex(@"(?:[/*+\-(]|^)-?(\d)");
 
         var a = findNumbers.Matches(mathInput);
-        for(int i = 0; i<a.Count; i++)
+        for (int i = 0; i < a.Count; i++)
         {
             output[i] = int.Parse(a[i].Groups[1].ToString());
         }
         return output;
     }
 
-    private float ExecutePlan(TreeMath treeNode,Dictionary<TreeMath,int> values)
+    private float ExecutePlan(TreeMath treeNode, Dictionary<TreeMath, int> values)
     {
-        if(treeNode.Operation == Operation.TermNumber)
+        if (treeNode.Operation == Operation.TermNumber)
         {
             return values[treeNode];
         }
         if (treeNode.Operation == Operation.Add)
-            return ExecutePlan(treeNode.Term1!,values) + ExecutePlan(treeNode.Term2!,values);
+            return ExecutePlan(treeNode.Term1!, values) + ExecutePlan(treeNode.Term2!, values);
         else if (treeNode.Operation == Operation.Sub)
-            return ExecutePlan(treeNode.Term1!,values) - ExecutePlan(treeNode.Term2!,values);
+            return ExecutePlan(treeNode.Term1!, values) - ExecutePlan(treeNode.Term2!, values);
         else if (treeNode.Operation == Operation.Mult)
-            return ExecutePlan(treeNode.Term1!,values) * ExecutePlan(treeNode.Term2!,values);
+            return ExecutePlan(treeNode.Term1!, values) * ExecutePlan(treeNode.Term2!, values);
         else if (treeNode.Operation == Operation.Divide)
-            return ExecutePlan(treeNode.Term1!,values) / ExecutePlan(treeNode.Term2!,values);
+            return ExecutePlan(treeNode.Term1!, values) / ExecutePlan(treeNode.Term2!, values);
         else
             throw new Exception("Invalid operation");
     }
 
+
+    private List<Operation> GetOperations(List<Token> mathInput)
+    {
+
+        var output = new List<Operation>();
+        foreach (var token in mathInput)
+        {
+            var toAdd = token.TokenType switch
+            {
+                TokenType.Add => Operation.Add,
+                TokenType.Subtract => Operation.Sub,
+                TokenType.Multiply => Operation.Mult,
+                TokenType.Divide => Operation.Divide,
+                TokenType.OpenParentheses => Operation.OpenParenthesis,
+                TokenType.ClosedParentheses => Operation.ClosedParenthesis,
+                _ => Operation.TermNumber
+            };
+            output.Add(toAdd);
+        }
+        return output;
+
+    }
     private List<Operation> GetOperations(string mathInput)
     {
         mathInput = mathInput.Replace(" ", "");
@@ -114,12 +164,12 @@ public class MathStatement
         var doubleSign = false;
         foreach (var a in mathInput)
         {
-            if(a == '(' || a == ')')
+            if (a == '(' || a == ')')
             {
                 builder.Append(a);
                 continue;
             }
-            if (char.IsDigit(a) )
+            if (char.IsDigit(a))
             {
                 doubleSign = false;
                 continue;
@@ -154,7 +204,8 @@ public class MathStatement
 
     private TreeMath GetExecutionTree(Queue<Operation> stack)
     {
-        var a = GetTreeMaths(stack);
+        //var a = GetTreeMaths(stack);
+        var a = stack.Select(x => new TreeMath(x)).ToList();
 
         var output = Reduce(a);
         if (output.Count > 1)
@@ -173,7 +224,7 @@ public class MathStatement
         while (stack.Count > 0)
         {
             var value = stack.Dequeue();
-            if(value == Operation.OpenParenthesis || value == Operation.ClosedParenthesis)
+            if (value == Operation.OpenParenthesis || value == Operation.ClosedParenthesis)
             {
                 list.Add(new(value));
             }
@@ -185,7 +236,7 @@ public class MathStatement
                     //first = false;
                 }
                 list.Add(new(value));
-                if(stack.Count > 0 && stack.Peek() == Operation.ClosedParenthesis)
+                if (stack.Count > 0 && stack.Peek() == Operation.ClosedParenthesis)
                 {
                     list.Add(new());
                 }
@@ -241,7 +292,7 @@ public class MathStatement
         return list;
     }
 
-    private class TreeMath
+    public class TreeMath
     {
         public TreeMath()
         {

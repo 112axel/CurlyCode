@@ -7,7 +7,7 @@ public static class StreamWordReader
     public static string ReadWord(StreamReader stream)
     {
         var builder = new StringBuilder();
-
+        List<char> breakChars = new List<char>() {';','(',')','+','*','-','/' };
         ConsumeWhiteSpace(stream);
         while (true)
         {
@@ -19,9 +19,9 @@ public static class StreamWordReader
             {
                 break;
             }
-            if((char)stream.Peek() == ';')
+            if (breakChars.Contains((char)stream.Peek()))
             {
-                if(builder.Length == 0)
+                if (builder.Length == 0)
                 {
                     builder.Append((char)stream.Read());
                 }
@@ -34,7 +34,8 @@ public static class StreamWordReader
 
     }
 
-    private static void ConsumeWhiteSpace(StreamReader stream) {
+    private static void ConsumeWhiteSpace(StreamReader stream)
+    {
         while (char.IsWhiteSpace((char)stream.Peek()) && stream.Peek() != -1)
         {
             stream.Read();

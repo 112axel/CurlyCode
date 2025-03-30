@@ -17,7 +17,9 @@ public enum TokenType
 
     End = 1 << 11,
     ReturnType = 1 << 12,
-    Exit = 1 << 13,
+    Function = 1 << 13,
+    OpenParentheses = 1 << 14,
+    ClosedParentheses = 1 << 15,
 
     //contains data
     Data = Text ^ Type ^ Number,

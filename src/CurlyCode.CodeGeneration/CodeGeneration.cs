@@ -51,7 +51,7 @@ public static class CodeGeneration
 
     private static void HandleCommand(IOperation operation)
     {
-        if (operation.IsMatch("Exit"))
+        if (operation.Identifier == "exit")
         {
             RunStatements(operation.Statements);
             SysCalls.Exit(Writer);
@@ -62,21 +62,50 @@ public static class CodeGeneration
     {
         foreach (var statement in statements)
         {
-            if (statement is AbsoluteStatement absolute)
-            {
-                StackCode.AddValueToStack(Writer, absolute.Value);
-            }
-            else if (statement is MathStatement math)
-            {
-
-            }
-            else if (statement is VariableStatement variable)
-            {
-                var addr = StackAbstraction.GetAddress(variable.Identifier);
-                Writer.PutOnTopOfStack(addr);
-                //StackCode.GetValueFromStack(Writer, addr);
-            }
+            RunStatement(statement);
         }
+    }
+
+    private static void RunStatement(IStatement statement)
+    {
+        if (statement is AbsoluteStatement absolute)
+        {
+            StackCode.AddValueToStack(Writer, absolute.Value);
+        }
+        else if (statement is MathStatement math)
+        {
+            var a = math.GetExecutionPlan();
+            var notation = math.ReversePolishNotation(a, null);
+            var termNumber = 0;
+            foreach (var node in notation)
+            {
+                if (node.Operation == MathStatement.Operation.TermNumber)
+                {
+                    RunStatement(math.Terms[termNumber]);
+                    termNumber++;
+                }
+                else if(node.Operation == MathStatement.Operation.Add)
+                {
+                    Writer.Add();
+                }
+                else if(node.Operation == MathStatement.Operation.Sub)
+                {
+                    Writer.Subtract();
+                }
+                else if(node.Operation == MathStatement.Operation.Mult)
+                {
+                    Writer.Multiply();
+                }
+            }
+
+        }
+        else if (statement is VariableStatement variable)
+        {
+            var addr = StackAbstraction.GetAddress(variable.Identifier);
+            Writer.PutOnTopOfStack(addr);
+            //StackCode.GetValueFromStack(Writer, addr);
+        }
+
     }
 
     private static bool IsMatch(this IOperation operation, string text)

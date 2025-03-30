@@ -34,11 +34,13 @@ public static class Lexer
             "-" => new Token(TokenType.Subtract, null),
             "/" => new Token(TokenType.Divide, null),
             "*" => new Token(TokenType.Multiply, null),
+            "(" => new Token(TokenType.OpenParentheses),
+            ")" => new Token(TokenType.ClosedParentheses),
 
             "=" => new Token(TokenType.Assignment, null),
             ";" => new Token(TokenType.End, null),
             "int" => new Token(TokenType.NumberType, word),
-            "exit" => new Token(TokenType.Exit, null),
+            //"exit" => new Token(TokenType.Function, null),
 
             _ => NumberOrText(word)
         };

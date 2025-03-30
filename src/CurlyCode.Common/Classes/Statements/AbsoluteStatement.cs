@@ -9,9 +9,4 @@ public class AbsoluteStatement : IStatement
     {
         Value = value;
     }
-
-    public int GetValue()
-    {
-        return Value;
-    }
 }

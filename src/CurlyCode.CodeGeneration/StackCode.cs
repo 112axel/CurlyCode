@@ -20,7 +20,22 @@ public static class StackCode
         writer.WriteLine($"push rax");
     }
 
-    //public static void PopValue(StreamWriter writer) {
-    //    writer.WriteLine("");
-    //}
+    public static void SetValue(this StreamWriter writer, int offset)
+    {
+
+    }
+
+    public static void PopRax(this StreamWriter writer)
+    {
+        writer.WriteLine("pop rax");
+    }
+    public static void PopRbx(this StreamWriter writer)
+    {
+        writer.WriteLine("pop rbx");
+    }
+    public static void PushRax(this StreamWriter writer)
+    {
+        writer.WriteLine("push rax");
+    }
+
 }

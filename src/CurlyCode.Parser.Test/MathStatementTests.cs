@@ -7,7 +7,7 @@ public sealed class MathStatementTests
 {
     public float Calculate(string math)
     {
-        return new MathStatement().Calculate(math);
+        return new MathStatement(new()).Calculate(math);
     }
 
     [TestMethod]
@@ -50,5 +50,64 @@ public sealed class MathStatementTests
     {
         var math = "5+2*5*4";
         Assert.AreEqual(Calculate(math), 45);
+    }
+
+    [TestMethod]
+    public void PostFixTest()
+    {
+        var tree = new MathStatement.TreeMath()
+        {
+            Term1 = new MathStatement.TreeMath()
+            {
+                Term1 = new MathStatement.TreeMath()
+                {
+                    Operation = MathStatement.Operation.TermNumber,
+                },
+                Term2 = new MathStatement.TreeMath()
+                {
+                    Operation = MathStatement.Operation.TermNumber,
+                },
+                Operation = MathStatement.Operation.Add
+            },
+            Term2 = new MathStatement.TreeMath()
+            {
+                Term1 = new MathStatement.TreeMath()
+                {
+                    Operation = MathStatement.Operation.TermNumber,
+                },
+                Term2 = new MathStatement.TreeMath()
+                {
+                    Operation = MathStatement.Operation.TermNumber,
+                },
+                Operation = MathStatement.Operation.Add
+            },
+            Operation = MathStatement.Operation.Mult,
+
+        };
+        var a = new MathStatement(new()).ReversePolishNotation(tree,null);
+
+        var expectedOperations = new List<MathStatement.Operation>() {
+            MathStatement.Operation.TermNumber,
+            MathStatement.Operation.TermNumber,
+            MathStatement.Operation.Add,
+            MathStatement.Operation.TermNumber,
+            MathStatement.Operation.TermNumber,
+            MathStatement.Operation.Add,
+            MathStatement.Operation.Mult,
+        };
+        Assert.IsTrue(CompareList(a,expectedOperations));
+
+    }
+
+    private bool CompareList(List<MathStatement.TreeMath> treeMaths, List<MathStatement.Operation> operations)
+    {
+        for (int i = 0; i < treeMaths.Count; i++)
+        {
+            if (treeMaths[i].Operation != operations[i])
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
